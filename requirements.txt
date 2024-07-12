@@ -1,11 +1,3 @@
-# Create a new file named requirements.txt and add the requests library to it
-# Install Dependencies and Freeze Them:
-# Ensure you have pip installed, then run the following commands: 
-
-# Bash:
-# pip install requests
-# pip freeze > requirements.txt
-
-
 requests
-
+flask
+gunicorn

@@ -13,5 +13,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the rest of the application code into the container at /app
 COPY weather.py .
 
+# Expose port 5000
+EXPOSE 5000
+
 # Define the default command to run the script
+#CMD ["gunicorn", "--bind", "0.0.0.0:1000" "weather.py"]
 CMD ["python", "weather.py"]

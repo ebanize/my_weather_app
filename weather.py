@@ -1,22 +1,10 @@
-#import requests
 
-#api_key = '090f8c0452deaf1ca4e65aec8b052777'
+# THE BEGINING OF NEW LINE OF CODES 
 
-#user_input = input("Enter city:")
-
-#weather_data = requests.get(f"https://api.openweathermap.org/data/2.5/weather?q={user_input}&units=imperial&APPID={api_key}")   
-
-#weather = weather_data.json()['weather'][0]['main']
-#temp = round(weather_data.json()['main']['temp'])
-
-
-
-#print(f"The weather {user_input} is: {weather}")
-#print(f"The temperature in {user_input} is: {temp}°F")
-
-
-
+from flask import Flask, request, jsonify
 import requests
+
+app = Flask(__name__)
 
 def fahrenheit_to_celsius(fahrenheit):
     """
@@ -33,13 +21,32 @@ def fahrenheit_to_celsius(fahrenheit):
 
 api_key = '090f8c0452deaf1ca4e65aec8b052777'
 
-user_input = input("Enter city:")
+@app.route('/weather', methods=['GET'])
+def get_weather():
+    user_input = request.args.get('city')
+    if not user_input:
+        return jsonify({'error': 'City parameter is required'}), 400
+    
+    weather_data = requests.get(f"https://api.openweathermap.org/data/2.5/weather?q={user_input}&units=imperial&APPID={api_key}")
+    
+    if weather_data.status_code != 200:
+        return jsonify({'error': 'City not found'}), 404
 
-weather_data = requests.get(f"https://api.openweathermap.org/data/2.5/weather?q={user_input}&units=imperial&APPID={api_key}")   
+    weather = weather_data.json()['weather'][0]['main']
+    temp_fahrenheit = round(weather_data.json()['main']['temp'])
+    temp_celsius = round(fahrenheit_to_celsius(temp_fahrenheit), 2)
 
-weather = weather_data.json()['weather'][0]['main']
-temp_fahrenheit = round(weather_data.json()['main']['temp'])
-temp_celsius = round(fahrenheit_to_celsius(temp_fahrenheit), 2)
+    return jsonify({
+        'city': user_input,
+        'weather': weather,
+        'temperature': {
+            'fahrenheit': f"{temp_fahrenheit}°F",
+            'celsius': f"{temp_celsius}°C"
+        }
+    })
 
-print(f"The weather in {user_input} is: {weather}")
-print(f"The temperature in {user_input} is: {temp_fahrenheit}°F / {temp_celsius}°C")
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
+
+
+
